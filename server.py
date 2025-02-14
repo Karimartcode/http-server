@@ -17,3 +17,20 @@ def receive_request(client_socket):
         if len(chunk) < 4096:
             break
     return data.decode('utf-8')
+
+
+def parse_request(raw):
+    lines = raw.split('\r\n')
+    if not lines:
+        return None
+    method, path, version = lines[0].split(' ', 2)
+    headers = {}
+    for line in lines[1:]:
+        if ':' in line:
+            key, val = line.split(':', 1)
+            headers[key.strip()] = val.strip()
+        elif line == '':
+            break
+    body_start = raw.find('\r\n\r\n')
+    body = raw[body_start + 4:] if body_start >= 0 else ''
+    return {"method": method, "path": path, "version": version, "headers": headers, "body": body}
