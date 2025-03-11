@@ -34,3 +34,20 @@ def parse_request(raw):
     body_start = raw.find('\r\n\r\n')
     body = raw[body_start + 4:] if body_start >= 0 else ''
     return {"method": method, "path": path, "version": version, "headers": headers, "body": body}
+
+
+CONTENT_TYPES = {
+    ".html": "text/html",
+    ".css": "text/css",
+    ".js": "application/javascript",
+    ".json": "application/json",
+    ".png": "image/png",
+    ".jpg": "image/jpeg",
+    ".txt": "text/plain",
+}
+
+def get_content_type(path):
+    for ext, ct in CONTENT_TYPES.items():
+        if path.endswith(ext):
+            return ct
+    return "application/octet-stream"
