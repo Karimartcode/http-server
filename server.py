@@ -51,3 +51,13 @@ def get_content_type(path):
         if path.endswith(ext):
             return ct
     return "application/octet-stream"
+
+
+def build_response(status_code, status_text, headers, body):
+    response = f"HTTP/1.1 {status_code} {status_text}\r\n"
+    for key, val in headers.items():
+        response += f"{key}: {val}\r\n"
+    response += "\r\n"
+    if isinstance(body, bytes):
+        return response.encode('utf-8') + body
+    return (response + body).encode('utf-8')
