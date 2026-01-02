@@ -61,3 +61,21 @@ def build_response(status_code, status_text, headers, body):
     if isinstance(body, bytes):
         return response.encode('utf-8') + body
     return (response + body).encode('utf-8')
+
+
+import os
+
+STATIC_DIR = "static"
+
+def serve_file(path):
+    filepath = os.path.join(STATIC_DIR, path.lstrip('/'))
+    if not os.path.isfile(filepath):
+        return build_response(404, "Not Found", {"Content-Type": "text/html"}, "<h1>404 Not Found</h1>")
+    ct = get_content_type(filepath)
+    mode = 'rb' if ct.startswith('image') else 'r'
+    with open(filepath, mode) as f:
+        content = f.read()
+    if isinstance(content, str):
+        content = content.encode('utf-8')
+    headers = {"Content-Type": ct, "Content-Length": str(len(content))}
+    return build_response(200, "OK", headers, content)
