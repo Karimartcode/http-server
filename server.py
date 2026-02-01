@@ -79,3 +79,20 @@ def serve_file(path):
         content = content.encode('utf-8')
     headers = {"Content-Type": ct, "Content-Length": str(len(content))}
     return build_response(200, "OK", headers, content)
+
+
+routes = {}
+
+def route(path):
+    def decorator(fn):
+        routes[path] = fn
+        return fn
+    return decorator
+
+def handle_request(request):
+    if not request:
+        return build_response(400, "Bad Request", {}, "")
+    path = request["path"]
+    if path in routes:
+        return routes[path](request)
+    return serve_file(path)
